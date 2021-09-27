@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/context
+       http://www.springframework.org/schema/context/spring-context.xsd">
 
     <!--方法一: 根据构造方法反射创建对象, 也可以通过 constructor-arg 子标签指定有参构造-->
     <bean id="user1" class="com.xtyuns.pojo.User"/>
@@ -10,4 +14,6 @@
     <!--方法三: 使用实例工程创建对象-->
     <bean id="userFactory" class="com.xtyuns.factory.InstanceUserFactory"/>
     <bean id="user3" factory-bean="userFactory" factory-method="getInstance"/>
+    <!--方法四: 使用注解的方式创建对象, @Component/@Controller/@Service/@Repository-->
+    <context:component-scan base-package="com.xtyuns.pojo"/>
 </beans>
