@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/context
+       http://www.springframework.org/schema/context/spring-context.xsd
+       http://www.springframework.org/schema/tx
+       http://www.springframework.org/schema/tx/spring-tx.xsd
+       http://www.springframework.org/schema/aop
+       https://www.springframework.org/schema/aop/spring-aop.xsd">
+
+    <!--本配置文件的核心内容是 SM 的整合以及事务的配置-->
+    <!--将由 ContextLoaderListener 在 web.xml 中加载本配置文件-->
+    <context:component-scan base-package="com.xtyuns"/>
+
+
+    <!--定义数据源对象, 通过 properties 加载参数-->
+    <context:property-placeholder location="classpath:jdbc.properties" system-properties-mode="FALLBACK"/>
+    <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+        <property name="driverClassName" value="${driverClassName}"/>
+        <property name="url" value="${url}"/>
+        <property name="username" value="${username}"/>
+        <property name="password" value="${password}"/>
+    </bean>
+
+    <!--定义 SqlSession 工厂对象(MyBatis)-->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource"/>
+        <!--默认的 mapperLocations 为映射器所在路径, 所以如果 SQL 映射器文件与映射器在同一路径下可以省略本属性-->
+        <property name="mapperLocations" value="classpath:com/xtyuns/mapper/*.xml"/>
+    </bean>
+
+    <!--定义映射器扫描器对象(MyBatis)-->
+    <bean id="mapperScannerConfigurer" class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="com.xtyuns.mapper"/>
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"/>
+    </bean>
+
+
+    <!--定义事务管理器对象-->
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+    <!--启用事务注解驱动-->
+    <tx:annotation-driven transaction-manager="transactionManager"/>
+
+    <!--使用 xml 声明事务-->
+<!--    &lt;!&ndash;配置事务拦截方法&ndash;&gt;-->
+<!--    <tx:advice id="txAdvice" transaction-manager="transactionManager">-->
+<!--        <tx:attributes>-->
+<!--            <tx:method name="save*" rollback-for="Exception"/>-->
+<!--            <tx:method name="remove*" rollback-for="Exception"/>-->
+<!--            <tx:method name="modify*" rollback-for="Exception"/>-->
+<!--            <tx:method name="*" read-only="true" propagation="SUPPORTS"/>-->
+<!--        </tx:attributes>-->
+<!--    </tx:advice>-->
+
+<!--    &lt;!&ndash;织入事务&ndash;&gt;-->
+<!--    <aop:config>-->
+<!--        <aop:pointcut id="txPoint" expression="execution(* com.xtyuns.service.impl.*.*(..))"/>-->
+<!--        <aop:advisor advice-ref="txAdvice" pointcut-ref="txPoint"/>-->
+<!--    </aop:config>-->
+</beans>
