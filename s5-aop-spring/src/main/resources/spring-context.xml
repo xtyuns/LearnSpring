@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/aop
+       http://www.springframework.org/schema/aop/spring-aop.xsd
+       http://www.springframework.org/schema/context
+       http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <bean id="bankDao" class="com.xtyuns.dao.impl.BankDaoImpl"/>
+    <bean id="security" class="com.xtyuns.anquan.Security"/>
+    <bean id="clearResource" class="com.xtyuns.qinli.ClearResource"/>
+    <bean id="logger" class="com.xtyuns.rizhi.Logger"/>
+
+    <aop:config>
+        <!--定义切入点-->
+        <!--execution(modifiers-pattern? ret-type-pattern declaring-type-pattern?name-pattern(param-pattern) throws-pattern?)-->
+        <aop:pointcut id="bd" expression="execution(* com.xtyuns.dao.impl.BankDaoImpl.*(..))"/>
+        <!--定义切面以及前置通知, 越先声明执行越靠前-->
+        <aop:aspect ref="security">
+            <aop:before pointcut-ref="bd" method="isSecurity"/>
+        </aop:aspect>
+        <!--定义切面以及后置通知, 越先声明执行越靠后-->
+        <aop:aspect ref="clearResource">
+            <aop:after pointcut-ref="bd" method="clear"/>
+        </aop:aspect>
+        <!--定义切面以及后置通知, 越先声明执行越靠后-->
+        <aop:aspect ref="logger">
+            <aop:after pointcut-ref="bd" method="log"/>
+        </aop:aspect>
+    </aop:config>
+</beans>
